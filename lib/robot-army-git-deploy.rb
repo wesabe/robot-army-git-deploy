@@ -5,6 +5,7 @@ require 'rubygems'
 require 'grit'
 require 'robot-army'
 require 'fileutils'
+require 'highline'
 
 # internal files
 require 'robot-army-git-deploy/git_deployer'

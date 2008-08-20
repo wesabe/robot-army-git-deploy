@@ -31,6 +31,7 @@ SPEC = Gem::Specification.new do |s|
   s.add_dependency("robot-army", [">= 0.1.1"])
   s.add_dependency("thor", ["> 0.0.0"])
   s.add_dependency("grit", ["> 0.0.0"])
+  s.add_dependency("highline", ["> 0.0.0"])
 end
 
 class Default < Thor
