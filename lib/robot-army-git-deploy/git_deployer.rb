@@ -153,7 +153,8 @@ module RobotArmy::GitDeployer
   end
   
   def diff(what, options={})
-    puts git.diff({:stat => true, :color => true}.merge(options), what)
+    # dumb, dumb, dumb
+    puts git.send(:method_missing, :diff, {:stat => true, :color => true}.merge(options), what)
   end
   
   def deployed_revision
