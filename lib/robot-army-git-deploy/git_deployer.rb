@@ -15,7 +15,7 @@ module RobotArmy::GitDeployer
             puts "%s: %s %s [%s]" % [
               host, 
               color(commit.id_abbrev, :yellow), 
-              commit.message, 
+              commit.message.to_a.first.chomp, 
               commit.author.name]
           else
             puts "%s: %s %s" % [
