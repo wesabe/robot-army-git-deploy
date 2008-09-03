@@ -39,8 +39,8 @@ module RobotArmy::GitDeployer
       
       desc "archive", "Write HEAD to a tgz file"
       def archive
-        say "Archiving to #{app}-archive.tar.gz"
-        %x{git archive --format=tar HEAD | gzip >#{app}-archive.tar.gz}
+        say "Archiving to #{archive_path}"
+        %x{git archive --format=tar HEAD | gzip >#{archive_path}}
       end
       
       desc "stage", "Stages the locally-generated archive on each host"
@@ -54,7 +54,7 @@ module RobotArmy::GitDeployer
         end
         
         say "Staging #{app} into #{deploy_path}"
-        cptemp("#{app}-archive.tar.gz", :user => user) do |path|
+        cptemp(archive_path, :user => user) do |path|
           %x{tar -xvz -f #{path} -C #{deploy_path}}
           File.open(File.join(deploy_path, 'REVISION'), 'w') {|f| f << revision}
           path # just so that we don't try to return a File and generate a warning
@@ -83,6 +83,7 @@ module RobotArmy::GitDeployer
       end
     end
   end
+  
   private
   
   def repo
@@ -130,6 +131,10 @@ module RobotArmy::GitDeployer
     pairs.each do |objectname, refname|
       git.update_ref({:d => true}, refname, objectname)
     end
+  end
+  
+  def archive_path
+    "#{app}-archive.tar.gz"
   end
   
   def deploy_root
