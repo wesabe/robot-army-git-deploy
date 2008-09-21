@@ -11,7 +11,7 @@ module RobotArmy::GitDeployer
         
         deployed_revisions.each do |host, revision|
           if revision
-            commit = repo.commits(revision, 1).first
+            commit = commit_from_revision_or_abort(revision)
             puts "%s: %s %s [%s]" % [
               host, 
               color(commit.id_abbrev, :yellow), 
@@ -164,6 +164,15 @@ module RobotArmy::GitDeployer
   
   def deployed_revision
     deployed_revisions.find{|host, revision| revision}.last
+  end
+
+  def commit_from_revision_or_abort(revision)
+    if commit = repo.commits(revision, 1).first
+      return commit
+    else
+      $stderr.puts "#{color('ERROR', :red)}: The deployed revision (#{color(revision, :yellow)}) was not found in your local repository. Perhaps you need to update first?"
+      exit(1)
+    end
   end
   
   def revfile

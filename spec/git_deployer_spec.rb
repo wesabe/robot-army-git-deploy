@@ -26,6 +26,10 @@ class Deploy < RobotArmy::TaskMaster
   def group
     "nobody"
   end
+
+  def color(str, color)
+    str
+  end
   
   # make all methods public so we can test 'em easily
   private_instance_methods.each { |m| public m }
@@ -140,6 +144,31 @@ describe RobotArmy::GitDeployer do
     it "is the current HEAD" do
       @deploy.stub!(:repo).and_return(stub(:repo, :commits => [FakeCommit.new('abcde')]))
       @deploy.target_revision.must == 'abcde'
+    end
+  end
+
+  describe "commit_from_revision_or_abort" do
+    describe "given a revision in the repository" do
+      before do
+        @commit = FakeCommit.new('abcde')
+        @deploy.stub!(:repo).and_return(stub(:repo, :commits => [@commit]))
+      end
+
+      it "returns the commit for that revision" do
+        @deploy.commit_from_revision_or_abort('abcde').must == @commit
+      end
+    end
+
+    describe "given a revision not in the repository" do
+      before do
+        @deploy.stub!(:repo).and_return(stub(:repo, :commits => []))
+      end
+
+      it "warns about the missing commit and exits" do
+        @deploy.should_receive(:exit).with(1)
+        capture(:stderr) { @deploy.commit_from_revision_or_abort('abcde') }.
+          must == "ERROR: The deployed revision (abcde) was not found in your local repository. Perhaps you need to update first?\n"
+      end
     end
   end
 end
