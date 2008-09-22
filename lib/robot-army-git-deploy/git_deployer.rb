@@ -31,9 +31,12 @@ module RobotArmy::GitDeployer
         
         if oldest_deployed_revision == target_revision
           puts "Deployed revision is up to date"
-        else
+        elsif oldest_deployed_revision
           log "#{oldest_deployed_revision}..#{target_revision}"
           diff "#{oldest_deployed_revision}..#{target_revision}"
+        else
+          log target_revision, :root => true
+          diff target_revision, :root => true
         end
       end
       
@@ -111,11 +114,12 @@ module RobotArmy::GitDeployer
   end
   
   def oldest_deployed_revision
-    deployed_revisions.
-      map {|host, revision| repo.commit(revision) if revision}.
-      compact.
-      sort.
-        first.id
+    oldest_commit = deployed_revisions.
+                      map {|host, revision| repo.commit(revision) if revision}.
+                      compact.
+                      sort.
+                      first
+    return oldest_commit.id if oldest_commit
   end
   
   def update_server_refs
