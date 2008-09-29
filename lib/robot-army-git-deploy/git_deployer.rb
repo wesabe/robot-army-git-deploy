@@ -32,7 +32,7 @@ module RobotArmy::GitDeployer
         if oldest_deployed_revision == target_revision
           puts "Deployed revision is up to date"
         else
-          log "#{oldest_deployed_revision}..#{target_revision}"
+          shortlog "#{oldest_deployed_revision}..#{target_revision}"
           diff "#{oldest_deployed_revision}..#{target_revision}"
         end
       end
@@ -155,6 +155,10 @@ module RobotArmy::GitDeployer
   
   def log(what, options={})
     puts git.log({:pretty=>'oneline', :'abbrev-commit'=>true, :color=>true}.merge(options), what)
+  end
+  
+  def shortlog(what, options={})
+    puts git.shortlog({:color=>true}.merge(options), what)
   end
   
   def diff(what, options={})
