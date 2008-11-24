@@ -31,13 +31,11 @@ module RobotArmy::GitDeployer
 
         if oldest_deployed_revision == target_revision
           puts "Deployed revision is up to date"
-        else
-          shortlog "#{oldest_deployed_revision}..#{target_revision}"
         elsif oldest_deployed_revision
-          log "#{oldest_deployed_revision}..#{target_revision}"
+          shortlog "#{oldest_deployed_revision}..#{target_revision}"
           diff "#{oldest_deployed_revision}..#{target_revision}"
         else
-         log target_revision, :root => true
+          shortlog target_revision, :root => true
           diff target_revision, :root => true
         end
       end
@@ -72,6 +70,7 @@ module RobotArmy::GitDeployer
           FileUtils.rm_f(current_link)
           FileUtils.ln_sf(deploy_path, current_link)
         end
+        update_server_refs(true)
       end
 
       def cleanup
@@ -107,6 +106,10 @@ module RobotArmy::GitDeployer
     @deployed_revisions ||= hosts.zip(Array(remote { File.read(revfile).chomp if File.exist?(revfile) }))
   end
 
+  def clear_deployed_revisions_cache
+    @deployed_revisions = nil
+  end
+
   def deployed_revisions_equal?
     deployed_revisions.map{|host, revision| revision}.uniq.size == 1
   end
@@ -124,7 +127,9 @@ module RobotArmy::GitDeployer
     return oldest_commit.id if oldest_commit
   end
 
-  def update_server_refs
+  def update_server_refs(refresh=false)
+    clear_deployed_revisions_cache if refresh
+
     deployed_revisions.each do |host, revision|
       # thanks to doener in #git for this idea
       git.update_ref({}, "refs/servers/#{host}", revision) if revision
