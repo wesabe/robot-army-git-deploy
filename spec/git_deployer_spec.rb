@@ -179,7 +179,7 @@ describe RobotArmy::GitDeployer do
 
     describe "when there are no deployed revisions" do
       before do
-        Dir.stub!(:glob).and_return(deployed_revision_paths_for_range(1...1))
+        Dir.stub!(:glob).with(File.join(@deploy.deploy_root, '*')).and_return(deployed_revision_paths_for_range(1...1))
       end
 
       it "does not remove anything" do
@@ -190,7 +190,7 @@ describe RobotArmy::GitDeployer do
 
     describe "when there are less than DEPLOY_COUNT deployed revisions" do
       before do
-        Dir.stub!(:glob).and_return(deployed_revision_paths_for_range(1...Deploy::DEPLOY_COUNT))
+        Dir.stub!(:glob).with(File.join(@deploy.deploy_root, '*')).and_return(deployed_revision_paths_for_range(1...Deploy::DEPLOY_COUNT))
       end
 
       it "does not remove anything" do
@@ -201,7 +201,7 @@ describe RobotArmy::GitDeployer do
 
     describe "when there are exactly DEPLOY_COUNT deployed revisions" do
       before do
-        Dir.stub!(:glob).and_return(deployed_revision_paths_for_range(1..Deploy::DEPLOY_COUNT))
+        Dir.stub!(:glob).with(File.join(@deploy.deploy_root, '*')).and_return(deployed_revision_paths_for_range(1..Deploy::DEPLOY_COUNT))
       end
 
       it "does not remove anything" do
@@ -212,7 +212,7 @@ describe RobotArmy::GitDeployer do
 
     describe "when there are more than DEPLOY_COUNT deployed revisions" do
       before do
-        Dir.stub!(:glob).and_return(deployed_revision_paths_for_range(1..(Deploy::DEPLOY_COUNT+2)))
+        Dir.stub!(:glob).with(File.join(@deploy.deploy_root, '*')).and_return(deployed_revision_paths_for_range(1..(Deploy::DEPLOY_COUNT+2)))
       end
 
       it "removes enough of the oldest deployed revisions to get the count down to DEPLOY_COUNT" do

@@ -90,7 +90,7 @@ module RobotArmy::GitDeployer
         deploy_count = self.class.const_get(:DEPLOY_COUNT)
 
         sudo do
-          deploy_paths = Dir.glob(File.join(deploy_path, '*')).sort
+          deploy_paths = Dir.glob(File.join(deploy_root, '*')).sort
           deploy_paths -= [current_link]
           FileUtils.rm_rf(deploy_paths.first(deploy_paths.size - deploy_count)) if deploy_paths.size > deploy_count
         end
