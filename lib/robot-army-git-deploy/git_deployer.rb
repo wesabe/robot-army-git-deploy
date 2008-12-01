@@ -1,5 +1,7 @@
 module RobotArmy::GitDeployer
   def self.included(base)
+    base.const_set(:DEPLOY_COUNT, 5)
+
     base.class_eval do
       desc "check", "Checks the deploy status"
       def check(opts={})
@@ -74,8 +76,24 @@ module RobotArmy::GitDeployer
       end
 
       def cleanup
+        clean_temporary_files
+        clean_old_revisions
+      end
+
+      def clean_temporary_files
         say "Cleaning up temporary files"
         FileUtils.rm_f("#{app}-archive.tar.gz")
+      end
+
+      def clean_old_revisions
+        say "Cleaning up old revisions"
+        deploy_count = self.class.const_get(:DEPLOY_COUNT)
+
+        sudo do
+          deploy_paths = Dir.glob(File.join(deploy_path, '*')).sort
+          deploy_paths -= [current_link]
+          FileUtils.rm_rf(deploy_paths.first(deploy_paths.size - deploy_count)) if deploy_paths.size > deploy_count
+        end
       end
 
       desc "run", "Run a full deploy"

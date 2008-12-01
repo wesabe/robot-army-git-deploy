@@ -171,4 +171,54 @@ describe RobotArmy::GitDeployer do
       end
     end
   end
+
+  describe "clean_old_revisions" do
+    def deployed_revision_paths_for_range(range, include_current=true)
+      (include_current ? [@deploy.current_link] : []) + range.map {|i| File.join(@deploy.deploy_root, "deploy-#{i}")}
+    end
+
+    describe "when there are no deployed revisions" do
+      before do
+        Dir.stub!(:glob).and_return(deployed_revision_paths_for_range(1...1))
+      end
+
+      it "does not remove anything" do
+        FileUtils.should_not_receive(:rm_rf)
+        silence(:stdout) { @deploy.clean_old_revisions }
+      end
+    end
+
+    describe "when there are less than DEPLOY_COUNT deployed revisions" do
+      before do
+        Dir.stub!(:glob).and_return(deployed_revision_paths_for_range(1...Deploy::DEPLOY_COUNT))
+      end
+
+      it "does not remove anything" do
+        FileUtils.should_not_receive(:rm_rf)
+        silence(:stdout) { @deploy.clean_old_revisions }
+      end
+    end
+
+    describe "when there are exactly DEPLOY_COUNT deployed revisions" do
+      before do
+        Dir.stub!(:glob).and_return(deployed_revision_paths_for_range(1..Deploy::DEPLOY_COUNT))
+      end
+
+      it "does not remove anything" do
+        FileUtils.should_not_receive(:rm_rf)
+        silence(:stdout) { @deploy.clean_old_revisions }
+      end
+    end
+
+    describe "when there are more than DEPLOY_COUNT deployed revisions" do
+      before do
+        Dir.stub!(:glob).and_return(deployed_revision_paths_for_range(1..(Deploy::DEPLOY_COUNT+2)))
+      end
+
+      it "removes enough of the oldest deployed revisions to get the count down to DEPLOY_COUNT" do
+        FileUtils.should_receive(:rm_rf).with(deployed_revision_paths_for_range(1..2, false)).exactly(@deploy.hosts.size).times
+        silence(:stdout) { @deploy.clean_old_revisions }
+      end
+    end
+  end
 end
