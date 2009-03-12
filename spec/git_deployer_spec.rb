@@ -51,6 +51,7 @@ end
 describe RobotArmy::GitDeployer do
   before do
     @deploy = Deploy.new
+    @deploy.options = (@options = {})
   end
 
   describe "tasks" do
@@ -141,9 +142,14 @@ describe RobotArmy::GitDeployer do
   end
 
   describe "target_revision" do
-    it "is the current HEAD" do
+    it "defaults to the current HEAD" do
       @deploy.stub!(:repo).and_return(stub(:repo, :commits => [FakeCommit.new('abcde')]))
       @deploy.target_revision.must == 'abcde'
+    end
+
+    it "can be set as an option" do
+      @options[:target_revision] = 'production'
+      @deploy.target_revision.must == 'production'
     end
   end
 

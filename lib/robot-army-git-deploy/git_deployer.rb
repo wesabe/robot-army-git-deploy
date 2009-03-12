@@ -3,6 +3,8 @@ module RobotArmy::GitDeployer
     base.const_set(:DEPLOY_COUNT, 5)
 
     base.class_eval do
+      method_options :target_revision => :optional
+
       desc "check", "Checks the deploy status"
       def check(opts={})
         update_server_refs
@@ -133,7 +135,7 @@ module RobotArmy::GitDeployer
   end
 
   def target_revision
-    repo.commits.first.id
+    options[:target_revision] || repo.commits.first.id
   end
 
   def oldest_deployed_revision
