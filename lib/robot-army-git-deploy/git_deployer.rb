@@ -135,7 +135,7 @@ module RobotArmy::GitDeployer
   end
 
   def target_revision
-    options[:target_revision] || repo.commits.first.id
+    options[:target_revision] || repo.head.commit
   end
 
   def oldest_deployed_revision
