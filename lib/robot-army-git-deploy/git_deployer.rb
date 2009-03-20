@@ -47,7 +47,7 @@ module RobotArmy::GitDeployer
       desc "archive", "Write HEAD to a tgz file"
       def archive
         say "Archiving to #{archive_path}"
-        %x{git archive --format=tar HEAD | gzip >#{archive_path}}
+        %x{git archive --format=tar #{target_revision} | gzip >#{archive_path}}
       end
 
       desc "stage", "Stages the locally-generated archive on each host"
