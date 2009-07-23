@@ -5,7 +5,7 @@ require 'thor/tasks'
 Dir[File.join(File.dirname(__FILE__), 'examples', '*.rb')].each {|f| require f}
 
 GEM = "robot-army-git-deploy"
-GEM_VERSION = "0.0.2"
+GEM_VERSION = "0.0.3"
 AUTHOR = "Brian Donovan"
 EMAIL = "brian@wesabe.com"
 HOMEPAGE = "http://github.com/wesabe/robot-army-git-deploy"
@@ -25,11 +25,11 @@ SPEC = Gem::Specification.new do |s|
   s.homepage = HOMEPAGE
   s.rubyforge_project = PROJECT
   s.date = Time.now.strftime('%Y-%m-%d')
-  
+
   s.require_path = 'lib'
   s.files = %w(LICENSE README.markdown Rakefile) + Dir.glob("{bin,lib,specs}/**/*")
-  s.add_dependency("robot-army", [">= 0.1.1"])
-  s.add_dependency("thor", ["> 0.0.0"])
+  s.add_dependency("robot-army", [">= 0.1.6"])
+  s.add_dependency("thor", [">= 0.11.3"])
   s.add_dependency("grit", ["> 0.0.0"])
   s.add_dependency("highline", ["> 0.0.0"])
 end
@@ -38,11 +38,11 @@ class Default < Thor
   # Set up standard Thortasks
   spec_task(Dir["spec/**/*_spec.rb"])
   install_task SPEC
-  
+
   desc "make_spec", "make a gemspec file"
   def make_spec
     File.open("#{GEM}.gemspec", "w") do |file|
       file.puts SPEC.to_ruby
-    end    
+    end
   end
 end

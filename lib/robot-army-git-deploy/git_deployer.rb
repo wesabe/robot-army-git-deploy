@@ -68,6 +68,8 @@ module RobotArmy::GitDeployer
         end
       end
 
+    no_tasks do
+
       def install
         say "Installing #{app} into #{current_link}"
         sudo do
@@ -105,6 +107,8 @@ module RobotArmy::GitDeployer
         install
         cleanup
       end
+
+    end
     end
   end
 
