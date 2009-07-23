@@ -3,7 +3,7 @@ module RobotArmy::GitDeployer
     base.const_set(:DEPLOY_COUNT, 5)
 
     base.class_eval do
-      method_options :target_revision => :optional
+      method_options :target_revision => :string
 
       desc "check", "Checks the deploy status"
       def check(opts={})
