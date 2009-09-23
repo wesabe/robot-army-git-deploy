@@ -1,48 +1,46 @@
-require 'rubygems'
-require 'rubygems/specification'
-require 'thor/tasks'
-
-Dir[File.join(File.dirname(__FILE__), 'examples', '*.rb')].each {|f| require f}
+require 'thor/rake_compat'
+require 'spec/rake/spectask'
 
 GEM = "robot-army-git-deploy"
-GEM_VERSION = "0.0.3"
-AUTHOR = "Brian Donovan"
-EMAIL = "brian@wesabe.com"
-HOMEPAGE = "http://github.com/wesabe/robot-army-git-deploy"
-SUMMARY = "Robot Army deployment with git repositories"
-PROJECT = "robot-army"
-
-SPEC = Gem::Specification.new do |s|
-  s.name = GEM
-  s.version = GEM_VERSION
-  s.platform = Gem::Platform::RUBY
-  s.has_rdoc = true
-  s.extra_rdoc_files = ["README.markdown", "LICENSE"]
-  s.summary = SUMMARY
-  s.description = s.summary
-  s.author = AUTHOR
-  s.email = EMAIL
-  s.homepage = HOMEPAGE
-  s.rubyforge_project = PROJECT
-  s.date = Time.now.strftime('%Y-%m-%d')
-
-  s.require_path = 'lib'
-  s.files = %w(LICENSE README.markdown Rakefile) + Dir.glob("{bin,lib,specs}/**/*")
-  s.add_dependency("robot-army", [">= 0.1.6"])
-  s.add_dependency("thor", [">= 0.11.3"])
-  s.add_dependency("grit", ["> 0.0.0"])
-  s.add_dependency("highline", ["> 0.0.0"])
-end
 
 class Default < Thor
-  # Set up standard Thortasks
-  spec_task(Dir["spec/**/*_spec.rb"])
-  install_task SPEC
+  include Thor::RakeCompat
 
-  desc "make_spec", "make a gemspec file"
-  def make_spec
-    File.open("#{GEM}.gemspec", "w") do |file|
-      file.puts SPEC.to_ruby
+  Spec::Rake::SpecTask.new(:spec) do |t|
+    t.libs << 'lib'
+    # t.spec_opts = ['--options', 'spec/spec.opts']
+    t.spec_files = FileList['spec/**/*_spec.rb']
+  end
+
+  Spec::Rake::SpecTask.new(:rcov) do |t|
+    t.libs << 'lib'
+    # t.spec_opts = ['--options', 'spec/spec.opts']
+    t.spec_files = FileList['spec/**/*_spec.rb']
+    t.rcov = true
+    t.rcov_dir = 'rcov'
+  end
+
+  begin
+    require 'jeweler'
+    Jeweler::Tasks.new do |s|
+      s.name = GEM
+      s.rubyforge_project = GEM
+      s.platform = Gem::Platform::RUBY
+      s.summary = "Robot Army deployment with git repositories"
+      s.email = "brian@wesabe.com"
+      s.homepage = "http://github.com/wesabe/robot-army-git-deploy"
+      s.description = "Robot Army deployment with git repositories"
+      s.authors = ['Brian Donovan']
+      s.require_path = 'lib'
+      s.bindir = 'bin'
+      s.files = %w(LICENSE README.markdown Rakefile) + Dir.glob("{bin,lib,specs}/**/*")
+      s.add_dependency("robot-army", [">= 0.1.7"])
+      s.add_dependency("thor", [">= 0.11.3"])
+      s.add_dependency("grit", ["> 0.0.0"])
+      s.add_dependency("highline", ["> 0.0.0"])
     end
+  rescue LoadError
+    puts "Jeweler, or one of its dependencies, is not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
   end
 end
+
